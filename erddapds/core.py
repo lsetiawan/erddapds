@@ -74,7 +74,7 @@ class ERDDAPDATASET(object):
         assert isinstance(self.variables, dict), f'{self.variables} is not a dictionary'
         assert isinstance(self.metadata, dict), f'{self.metadata} is not a dictionary'
 
-    def generate_datasetxml(self, gds_loc, big_parent_directory, *args):
+    def generate_datasetxml(self, *args, gds_loc='', big_parent_directory=''):
         if gds_loc:
             if os.path.basename(gds_loc) == 'GenerateDatasetsXml.sh':
                 try:
