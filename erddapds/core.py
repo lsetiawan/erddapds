@@ -128,16 +128,18 @@ class ERDDAPDATASET(object):
         return self.__dsfragment
 
     def add_to_datasetsxml(self, dsxml):
-        if dsxml and self.__dsfragment:
+        if dsxml:
             if os.path.basename(dsxml) == 'datasets.xml':
                 try:
                     with open(dsxml, 'rb') as xml:
                         tree = etree.XML(xml.read())
 
-                    tree.append(self.__dsfragment)
+                    if self.__dsfragment is not None:
+                        tree.append(self.__dsfragment)
 
                     with open(dsxml, 'wb') as fil:
-                        fil.write(etree.tostring(tree))
+                        rtree = tree.getroottree()
+                        rtree.write(fil, xml_declaration=True, encoding='ISO-8859-1')
 
                     cmd = ['touch', os.path.join(os.path.abspath(self.__bpd), 'flag', self.id)]
                     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
