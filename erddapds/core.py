@@ -119,7 +119,7 @@ class ERDDAPDATASET(object):
                     sys.exit(f'failed to execute program \'{prog}\': {str(e)}')
 
     def export_datasetxml(self):
-        if self.__dsfragment:
+        if self.__dsfragment is not None:
             with open(f'{self.id}.xml', 'wb') as f:
                 f.write(etree.tostring(self.__dsfragment, pretty_print=True))
 
