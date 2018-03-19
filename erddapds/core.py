@@ -5,12 +5,10 @@ from __future__ import (absolute_import,
 
 import os
 import sys
-import logging
 from collections import OrderedDict
 import subprocess
 
 from lxml import etree
-import yaml
 
 from erddapds.utils import (update_xml, print_tree)
 
@@ -59,8 +57,8 @@ METADATA = OrderedDict([
 
 
 class ERDDAPDATASET(object):
-    def __init__(self, id, details, variables, metadata=METADATA):
-        self.id = id
+    def __init__(self, dsid, details, variables, metadata=METADATA):
+        self.dsid = dsid
         self.details = details
         self.variables = variables
         self.metadata = metadata
@@ -73,10 +71,10 @@ class ERDDAPDATASET(object):
             print(e)
 
     def __repr__(self):
-        return f'<ERDDAPDATASET: {self.id}>'
+        return f'<ERDDAPDATASET: {self.dsid}>'
 
     def __check_type(self):
-        assert isinstance(self.id, str), f'{self.id} is not a string'
+        assert isinstance(self.dsid, str), f'{self.dsid} is not a string'
         assert isinstance(self.details, dict), f'{self.details} is not a dictionary'
         assert isinstance(self.variables, dict), f'{self.variables} is not a dictionary'
         assert isinstance(self.metadata, dict), f'{self.metadata} is not a dictionary'
@@ -105,7 +103,7 @@ class ERDDAPDATASET(object):
                         self.__dsfragment = tree.getroot()
                         # finalizing dataset fragment
                         update_xml(root=self.__dsfragment,
-                                   datasetID=self.id,
+                                   datasetID=self.dsid,
                                    metadata=self.metadata,
                                    details=self.details,
                                    dataset_vars=self.variables)
@@ -120,7 +118,7 @@ class ERDDAPDATASET(object):
 
     def export_datasetxml(self):
         if self.__dsfragment is not None:
-            with open(f'{self.id}.xml', 'wb') as f:
+            with open(f'{self.dsid}.xml', 'wb') as f:
                 f.write(etree.tostring(self.__dsfragment, pretty_print=True))
 
     def get_xmlroot(self):
@@ -141,7 +139,7 @@ class ERDDAPDATASET(object):
                         rtree = tree.getroottree()
                         rtree.write(fil, xml_declaration=True, encoding='ISO-8859-1')
 
-                    cmd = ['touch', os.path.join(os.path.abspath(self.__bpd), 'flag', self.id)]
+                    cmd = ['touch', os.path.join(os.path.abspath(self.__bpd), 'flag', self.dsid)]
                     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
                     out, err = p.communicate()
