@@ -90,16 +90,16 @@ def replace_yx_with_lonlat(root):
             axis.getparent().replace(axis, new_axis)
 
 
-def update_xml(root, datasetID, metadata, datasets, dataset_vars):
+def update_xml(root, datasetID, metadata, details, dataset_vars):
     root.attrib['datasetID'] = datasetID
-    root.find('.//fileNameRegex').text = datasets[datasetID]['fileNameRegex']
+    root.find('.//fileNameRegex').text = details['fileNameRegex']
 
-    title = datasets[datasetID]['title']
-    if 'keywords' in datasets[datasetID]:
+    title = details['title']
+    if 'keywords' in details:
         keywords = find_att(root, 'keywords')
-        keywords.text = datasets[datasetID]['keywords']
+        keywords.text = details['keywords']
     summary = find_att(root, 'summary')
-    summary.text = f'{title}\n\n{datasets[datasetID]["summary"]}'
+    summary.text = f'{title}\n\n{details["summary"]}'
     e = find_att(root, 'title')
     e.text = title
     #     summary.addnext(e)
@@ -145,7 +145,7 @@ def update_xml(root, datasetID, metadata, datasets, dataset_vars):
         if axis_name.text in IOOS_CATEGORIES:
             etree.SubElement(attrs, 'att', name='ioos_category').text = IOOS_CATEGORIES[axis_name.text]
 
-    if datasets[datasetID]['type'] == 'tide gauge':
+    if details['type'] == 'tide gauge':
         replace_yx_with_lonlat(root)
 
     for var_name in root.findall('.//dataVariable/destinationName'):
