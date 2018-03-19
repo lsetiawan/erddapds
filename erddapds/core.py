@@ -65,6 +65,7 @@ class ERDDAPDATASET(object):
         self.variables = variables
         self.metadata = metadata
         self.__dsfragment = None
+        self.__bpd = None
 
         try:
             self.__check_type()
@@ -93,6 +94,7 @@ class ERDDAPDATASET(object):
                     out, err = p.communicate()
 
                     if p.returncode == 0:
+                        self.__bpd = big_parent_directory
                         outlog = os.path.join(os.path.abspath(big_parent_directory),
                                               'logs', 'GenerateDatasetsXml.out')
 
@@ -124,3 +126,28 @@ class ERDDAPDATASET(object):
     def get_xmlroot(self):
         print_tree(self.__dsfragment)
         return self.__dsfragment
+
+    def add_to_datasetsxml(self, dsxml):
+        if dsxml and self.__dsfragment:
+            if os.path.basename(dsxml) == 'datasets.xml':
+                try:
+                    with open(dsxml, 'rb') as xml:
+                        tree = etree.XML(xml.read())
+
+                    tree.append(self.__dsfragment)
+
+                    with open(dsxml, 'wb') as fil:
+                        fil.write(etree.tostring(tree))
+
+                    cmd = ['touch', os.path.join(os.path.abspath(self.__bpd), 'flag', self.id)]
+                    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+                    out, err = p.communicate()
+
+                    if p.returncode == 0:
+                        print(f'Dataset sucessfully added.')
+                    else:
+                        print(f'Dataset generation failed, '
+                              f'exit-code={int(p.returncode)} error = {str(err)}')
+                except OSError as e:
+                    sys.exit(f'failed to execute program {str(e)}')
