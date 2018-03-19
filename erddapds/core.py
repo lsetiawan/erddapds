@@ -12,7 +12,7 @@ import subprocess
 from lxml import etree
 import yaml
 
-from erddapds.utils import update_xml
+from erddapds.utils import (update_xml, print_tree)
 
 METADATA = OrderedDict([
     ('infoUrl', {
@@ -64,12 +64,15 @@ class ERDDAPDATASET(object):
         self.details = details
         self.variables = variables
         self.metadata = metadata
-        self._dsfragment = None
+        self.__dsfragment = None
 
         try:
             self.__check_type()
         except TypeError as e:
             print(e)
+
+    def __repr__(self):
+        return f'<ERDDAPDATASET: {self.id}>'
 
     def __check_type(self):
         assert isinstance(self.id, str), f'{self.id} is not a string'
@@ -97,15 +100,15 @@ class ERDDAPDATASET(object):
 
                         parser = etree.XMLParser(remove_blank_text=True)
                         tree = etree.parse(outlog, parser)
-                        self._dsfragment = tree.getroot()
+                        self.__dsfragment = tree.getroot()
                         # finalizing dataset fragment
-                        update_xml(root=self._dsfragment,
+                        update_xml(root=self.__dsfragment,
                                    datasetID=self.id,
                                    metadata=self.metadata,
                                    details=self.details,
                                    dataset_vars=self.variables)
 
-                        return self._dsfragment
+                        return self.__dsfragment
                     else:
                         print(f'Dataset template generation failed, '
                               f'exit-code={int(p.returncode)} error = {str(err)}')
@@ -113,7 +116,11 @@ class ERDDAPDATASET(object):
                 except OSError as e:
                     sys.exit(f'failed to execute program \'{prog}\': {str(e)}')
 
+    def export_datasetxml(self):
+        if self.__dsfragment:
+            with open(f'{self.id}.xml', 'wb') as f:
+                f.write(etree.tostring(self.__dsfragment, pretty_print=True))
 
-
-
-
+    def get_xmlroot(self):
+        print_tree(self.__dsfragment)
+        return self.__dsfragment
