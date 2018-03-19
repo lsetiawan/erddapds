@@ -65,7 +65,7 @@ class ERDDAPDATASET(object):
 
         try:
             self.__check_type()
-        except Exception as e:
+        except TypeError as e:
             print(e)
 
     def __check_type(self):
@@ -74,24 +74,34 @@ class ERDDAPDATASET(object):
         assert isinstance(self.variables, dict), f'{self.variables} is not a dictionary'
         assert isinstance(self.metadata, dict), f'{self.metadata} is not a dictionary'
 
-    def generate_datasetxml(self, *args, gds_loc=''):
-        if os.path.basename(gds_loc) == 'GenerateDatasetsXml.sh':
-            try:
-                prog = ['/bin/bash', gds_loc]
-                cmd = prog + list(map(lambda x: str(x), args))
-                print(cmd)
+    def generate_datasetxml(self, gds_loc, big_parent_directory, *args):
+        if gds_loc:
+            if os.path.basename(gds_loc) == 'GenerateDatasetsXml.sh':
+                try:
+                    os.chdir(os.path.dirname(gds_loc))
+                    prog = ['/bin/bash', gds_loc]
+                    cmd = prog + list(map(lambda x: str(x), args))
 
-                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-                out, err = p.communicate()
+                    out, err = p.communicate()
 
-                if p.returncode == 0:
-                    print(f'command \'{prog} {args}\' succeeded, returned: {str(out)}')
-                else:
-                    print(f'command \'{prog} {args}\' failed, '
-                          f'exit-code={int(p.returncode)} error = {str(err)}')
-            except OSError as e:
-                sys.exit(f'failed to execute program \'{prog}\': {str(e)}')
+                    if p.returncode == 0:
+                        outlog = os.path.join(os.path.abspath(big_parent_directory),
+                                              'logs', 'GenerateDatasetsXml.out')
+
+                        print(f'Dataset template sucessfully generated. See: {outlog}')
+
+                        parser = etree.XMLParser(remove_blank_text=True)
+                        tree = etree.parse(outlog, parser)
+
+                        return tree.getroot()
+                    else:
+                        print(f'Dataset template generation failed, '
+                              f'exit-code={int(p.returncode)} error = {str(err)}')
+
+                except OSError as e:
+                    sys.exit(f'failed to execute program \'{prog}\': {str(e)}')
 
 
 

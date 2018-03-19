@@ -56,6 +56,10 @@ IOOS_CATEGORIES = {
 }
 
 # Functions from UBC --------------------------
+# Disclaimer: Functions below has been slightly modified.
+# Source: https://bitbucket.org/salishsea/erddap-datasets
+
+
 def print_tree(root):
     """Display an XML tree fragment with indentation.
     """
