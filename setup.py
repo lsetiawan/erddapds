@@ -8,6 +8,8 @@ from codecs import open
 
 from setuptools import find_packages, setup
 
+import erddapds
+
 here = os.path.abspath(os.path.dirname(__file__))
 
 # Dependencies.
@@ -20,7 +22,7 @@ with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='erddapds',
-    version='0.1-alpha',
+    version=erddapds.__version__,
     description='Tool for generating erddap datasets and integrate to datasets xml',
     long_description=long_description,
     url='',
