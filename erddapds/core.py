@@ -57,9 +57,12 @@ METADATA = OrderedDict([
     }),
 ])
 
+DETAILS = OrderedDict()
+VARIABLES = OrderedDict()
+
 
 class ERDDAPDATASET(object):
-    def __init__(self, dsid, details=None, variables=None, metadata=METADATA):
+    def __init__(self, dsid, details=DETAILS, variables=VARIABLES, metadata=METADATA, **kwargs):
         self.dsid = dsid
         self.details = details
         self.variables = variables

@@ -1,0 +1,36 @@
+details:
+  type: Timeseries
+  title: Data NcFile
+  summary: Testing Summary
+  fileNameRegex: Testfile.nc
+
+metadata:
+  infoUrl:
+    text: http://example.com/
+  institution:
+    text: My Institution
+  institution_fullname:
+    text: ERDDAP Institution, Some University
+    after: institution
+  license:
+    text: |
+      This is a license.
+      Please use with care.
+  project:
+    text: My wonderful project
+    after: title
+  creator_name:
+    text: John Doe
+    after: project
+  creator_email:
+    text: johndoe@someuniversity.edu
+    after: creator_name
+  creator_url:
+    text: http://example.com/johndoe
+    after: creator_email
+  acknowledgement:
+    text: AI, PC
+    after: creator_url
+  drawLandMask:
+    text: over
+    after: acknowledgement
