@@ -56,9 +56,9 @@ def main():
                                    '',
                                    '',
                                    'http://example.com',
-                                   'UW-APL',
-                                   'This is OOI Data!',
-                                   'OOI NetCDF',
+                                   'Some Organization',
+                                   'This is Some Data',
+                                   'NetCDF File',
                                    gds_loc=args.gdsloc,
                                    big_parent_directory=args.bpd)
 
