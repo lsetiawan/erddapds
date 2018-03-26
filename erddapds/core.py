@@ -10,7 +10,9 @@ import subprocess
 
 from lxml import etree
 
-from erddapds.utils import (update_xml, print_tree)
+from erddapds.utils import (update_xml,
+                            print_tree,
+                            update_datasetsxml)
 
 METADATA = OrderedDict([
     ('infoUrl', {
@@ -57,7 +59,7 @@ METADATA = OrderedDict([
 
 
 class ERDDAPDATASET(object):
-    def __init__(self, dsid, details, variables, metadata=METADATA):
+    def __init__(self, dsid, details=None, variables=None, metadata=METADATA):
         self.dsid = dsid
         self.details = details
         self.variables = variables
@@ -75,8 +77,10 @@ class ERDDAPDATASET(object):
 
     def __check_type(self):
         assert isinstance(self.dsid, str), f'{self.dsid} is not a string'
-        assert isinstance(self.details, dict), f'{self.details} is not a dictionary'
-        assert isinstance(self.variables, dict), f'{self.variables} is not a dictionary'
+        if self.details:
+            assert isinstance(self.details, dict), f'{self.details} is not a dictionary'
+        if self.variables:
+            assert isinstance(self.variables, dict), f'{self.variables} is not a dictionary'
         assert isinstance(self.metadata, dict), f'{self.metadata} is not a dictionary'
 
     def generate_datasetxml(self, *args, gds_loc='', big_parent_directory=''):
@@ -139,15 +143,6 @@ class ERDDAPDATASET(object):
                         rtree = tree.getroottree()
                         rtree.write(fil, xml_declaration=True, encoding='ISO-8859-1')
 
-                    cmd = ['touch', os.path.join(os.path.abspath(self.__bpd), 'flag', self.dsid)]
-                    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-                    out, err = p.communicate()
-
-                    if p.returncode == 0:
-                        print(f'Dataset sucessfully added.')
-                    else:
-                        print(f'Dataset generation failed, '
-                              f'exit-code={int(p.returncode)} error = {str(err)}')
+                    return update_datasetsxml(self.__bpd, self.dsid)
                 except OSError as e:
                     sys.exit(f'failed to execute program {str(e)}')

@@ -2,6 +2,9 @@ from __future__ import (absolute_import,
                         division,
                         print_function,
                         unicode_literals)
+import os
+import subprocess
+import sys
 
 from lxml import etree
 
@@ -173,3 +176,27 @@ def update_xml(root, datasetID, metadata, details, dataset_vars):
         if var_name.text in IOOS_CATEGORIES:
             etree.SubElement(attrs, 'att', name='ioos_category').text = IOOS_CATEGORIES[var_name.text]
 # End functions from UBC --------------------------
+
+
+def update_datasetsxml(bpd, dsid):
+    """Function to update the dataset after changes to datasets.xml
+
+    Args:
+        bpd (str): Big Parent Directory location.
+        dsid (str): Dataset ID
+
+    Returns:
+        int: Return integer
+    """
+    cmd = ['touch', os.path.join(os.path.abspath(bpd), 'flag', dsid)]
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    out, err = p.communicate()
+
+    if p.returncode == 0:
+        print(f'Dataset sucessfully updated.')
+        return p.returncode
+    else:
+        print(f'Dataset update failed, '
+              f'exit-code={int(p.returncode)} error = {str(err)}')
+        return p.returncode
