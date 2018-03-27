@@ -1,6 +1,8 @@
 # erddapds
 Tool for generating erddap datasets and integrate to datasets xml
 
+Adapted from https://bitbucket.org/salishsea/erddap-datasets, specially its [ERDDAP_datasets.ipynb jupyter notebook](http://nbviewer.jupyter.org/urls/bitbucket.org/salishsea/erddap-datasets/raw/tip/ERDDAP_datasets.ipynb)
+
 Package Version | Erddap Version
 ---|---
 0.1a0 | 1.82
