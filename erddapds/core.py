@@ -9,6 +9,7 @@ from collections import OrderedDict
 import subprocess
 
 from lxml import etree
+import xarray as xr
 
 from erddapds.utils import (update_xml,
                             print_tree,
@@ -149,3 +150,22 @@ class ERDDAPDATASET(object):
                     return update_datasetsxml(self.__bpd, self.dsid)
                 except OSError as e:
                     sys.exit(f'failed to execute program {str(e)}')
+
+    def update_dataset(self, datadir, newFile, bpd):
+        if self.details:
+            try:
+                ncfile = os.path.join(datadir, self.details['fileNameRegex'])
+                ds_old = xr.open_dataset(ncfile)
+                ds_new = xr.open_dataset(newFile)
+
+                dsall = xr.merge([ds_old, ds_new])
+                for k, v in ds_old.items():
+                    dsall[k].encoding = v.encoding
+                    dsall[k].attrs = v.attrs
+
+                dsall.to_netcdf(ncfile, unlimited_dims='time')
+                print('NetCDF Successfully Updated.')
+
+                update_datasetsxml(bpd, self.dsid)
+            except Exception as e:
+                print(e)
