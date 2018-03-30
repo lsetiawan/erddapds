@@ -45,7 +45,8 @@ setup(
     packages=find_packages(),
     install_requires=install_requires,
     entry_points=dict(console_scripts=[
-            'create_dataset = erddapds.scripts.create_dataset:main'
+            'create_dataset = erddapds.scripts.create_dataset:main',
+            'update_dataset = erddapds.scripts.update_dataset:main'
             ]
     )
 )
