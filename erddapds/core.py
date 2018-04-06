@@ -5,6 +5,7 @@ from __future__ import (absolute_import,
 
 import os
 import sys
+import shutil
 from collections import OrderedDict
 import subprocess
 
@@ -152,9 +153,10 @@ class ERDDAPDATASET(object):
                     sys.exit(f'failed to execute program {str(e)}')
 
     def update_dataset(self, datadir, newFile, bpd):
+        fname = os.path.basename(newFile)
         if self.details:
             try:
-                ncfile = os.path.join(datadir, self.details['fileNameRegex'])
+                ncfile = os.path.join(datadir, fname)
                 ds_old = xr.open_dataset(ncfile)
                 ds_new = xr.open_dataset(newFile)
 
@@ -167,5 +169,6 @@ class ERDDAPDATASET(object):
                 print('NetCDF Successfully Updated.')
 
                 update_datasetsxml(bpd, self.dsid)
+                shutil.rmtree(os.path.dirname(newFile))
             except Exception as e:
                 print(e)

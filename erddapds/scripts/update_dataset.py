@@ -11,11 +11,9 @@ import erddapds
 
 
 def get_arguments():
-    parser = argparse.ArgumentParser(description='Create new ERDDAP Dataset')
+    parser = argparse.ArgumentParser(description='Updates ERDDAP Dataset')
     parser.add_argument('dsid', metavar='DATASETID', type=str,
                         help='Dataset ID')
-    parser.add_argument('configfile', metavar='CONFIGFILE',
-                        help='Config yaml file')
     parser.add_argument('bpd', metavar='BIGPARENTDIRECTORY', type=str,
                         help='Path to Big Parent Directory')
     parser.add_argument('datadir', metavar='DATADIRECTORY', type=str,
@@ -40,8 +38,7 @@ def parse_yaml(yaml_file):
 def main():
     args = get_arguments()
     print(args)
-    ymldct = parse_yaml(args.configfile)
-    edd = erddapds.ERDDAPDATASET(args.dsid, **ymldct)
+    edd = erddapds.ERDDAPDATASET(args.dsid)
     edd.update_dataset(args.datadir, args.newnc, args.bpd)
 
 

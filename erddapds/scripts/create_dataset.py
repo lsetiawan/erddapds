@@ -25,7 +25,28 @@ def get_arguments():
     parser.add_argument('datadir', metavar='DATADIRECTORY', type=str,
                         help='Data Directory')
 
-    parser.add_argument('--version', action='version', version=erddapds.__version__)
+    # Optionals
+    parser.add_argument('-v','--version', action='version', version=erddapds.__version__)
+    parser.add_argument('--infourl',
+                        metavar='INFOURL',
+                        type=str,
+                        default='http://example.com',
+                        help='infoUrl')
+    parser.add_argument('--institution',
+                        metavar='INSTITUTION',
+                        type=str,
+                        default='Some Organization',
+                        help='institution')
+    parser.add_argument('--summary',
+                        metavar='SUMMARY',
+                        type=str,
+                        default='This is some data',
+                        help='summary')
+    parser.add_argument('--title',
+                        metavar='TITLE',
+                        type=str,
+                        default='NETCDF File',
+                        help='title')
 
     return parser.parse_args()
 
