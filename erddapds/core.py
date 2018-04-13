@@ -154,21 +154,20 @@ class ERDDAPDATASET(object):
 
     def update_dataset(self, datadir, newFile, bpd):
         fname = os.path.basename(newFile)
-        if self.details:
-            try:
-                ncfile = os.path.join(datadir, fname)
-                ds_old = xr.open_dataset(ncfile)
-                ds_new = xr.open_dataset(newFile)
+        try:
+            ncfile = os.path.join(datadir, fname)
+            ds_old = xr.open_dataset(ncfile, decode_cf=False)
+            ds_new = xr.open_dataset(newFile, decode_cf=False)
 
-                dsall = xr.merge([ds_old, ds_new])
-                for k, v in ds_old.items():
-                    dsall[k].encoding = v.encoding
-                    dsall[k].attrs = v.attrs
+            dsall = xr.merge([ds_old, ds_new], compat='no_conflicts')
+            for k, v in ds_new.items():
+                dsall[k].encoding = v.encoding
+                dsall[k].attrs = v.attrs
 
-                dsall.to_netcdf(ncfile, unlimited_dims='time')
-                print('NetCDF Successfully Updated.')
+            dsall.to_netcdf(ncfile, unlimited_dims='time')
 
-                update_datasetsxml(bpd, self.dsid)
-                shutil.rmtree(os.path.dirname(newFile))
-            except Exception as e:
-                print(e)
+            update_datasetsxml(bpd, self.dsid)
+            shutil.rmtree(os.path.dirname(newFile))
+            return 'NetCDF Successfully Updated.'
+        except Exception as e:
+            return e

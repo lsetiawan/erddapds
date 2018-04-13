@@ -39,7 +39,8 @@ def main():
     args = get_arguments()
     print(args)
     edd = erddapds.ERDDAPDATASET(args.dsid)
-    edd.update_dataset(args.datadir, args.newnc, args.bpd)
+    out = edd.update_dataset(args.datadir, args.newnc, args.bpd)
+    print(out)
 
 
 if __name__ == '__main__':
