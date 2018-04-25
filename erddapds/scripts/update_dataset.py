@@ -16,6 +16,8 @@ def get_arguments():
                         help='Dataset ID')
     parser.add_argument('bpd', metavar='BIGPARENTDIRECTORY', type=str,
                         help='Path to Big Parent Directory')
+    parser.add_argument('datasetsxml', metavar='DATASETSXML', type=str,
+                        help='Datasets xml file (Full path)')
     parser.add_argument('datadir', metavar='DATADIRECTORY', type=str,
                         help='Data Directory')
     parser.add_argument('newnc', metavar='NEWNCFILE', type=str,
@@ -39,7 +41,7 @@ def main():
     args = get_arguments()
     print(args)
     edd = erddapds.ERDDAPDATASET(args.dsid)
-    out = edd.update_dataset(args.datadir, args.newnc, args.bpd)
+    out = edd.update_dataset(args.datadir, args.newnc, args.bpd, args.datasetsxml)
     print(out)
 
 

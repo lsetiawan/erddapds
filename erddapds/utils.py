@@ -106,16 +106,29 @@ def update_xml(root, datasetID, metadata, details, dataset_vars):
     e = find_att(root, 'title')
     e.text = title
     #     summary.addnext(e)
+    attrs = root.find('addAttributes')
 
     for att, info in metadata.items():
-        e = etree.Element('att', name=att)
-        e.text = info['text']
+        # Erddap doesn't like cdm_data_type Station
+        # Change to TimeSeries
+        if att == 'cdm_data_type':
+            if info['text'] == 'Station':
+                info.update({ 'text':'TimeSeries' })
         try:
-            root.find(f'''.//att[@name="{info['after']}"]''').addnext(e)
+            if 'after' in info:
+                e = etree.Element('att', name=att)
+                e.text = info['text']
+                root.find(f'''.//att[@name="{info['after']}"]''').addnext(e)
+            else:
+                el = root.find(f'''.//att[@name="{att}"]''')
+                if el is not None:
+                    el.text = info['text']
+                else:
+                    etree.SubElement(attrs, 'att', name=att).text = info['text']
+
         except KeyError:
             find_att(root, att).text = info['text']
 
-    attrs = root.find('addAttributes')
     etree.SubElement(attrs, 'att', name='NCO').text = 'null'
     if not 'Bathymetry' in datasetID:
         etree.SubElement(attrs, 'att', name='history').text = 'null'

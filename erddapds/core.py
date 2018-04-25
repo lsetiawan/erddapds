@@ -152,8 +152,30 @@ class ERDDAPDATASET(object):
                 except OSError as e:
                     sys.exit(f'failed to execute program {str(e)}')
 
-    def update_dataset(self, datadir, newFile, bpd):
+    def __toggle_dataset(self, bpd, dsxml, active):
+        if dsxml:
+            if os.path.basename(dsxml) == 'datasets.xml':
+                try:
+                    with open(dsxml, 'rb') as xml:
+                        tree = etree.XML(xml.read())
+
+                    all_datasets = list(filter(lambda el: el.tag == 'dataset', tree.iterchildren()))
+                    dds = list(filter(lambda x: x.attrib['datasetID'] == self.dsid, all_datasets))[0]
+
+                    if active:
+                        dds.attrib['active'] = active
+
+                    with open(dsxml, 'wb') as fil:
+                        rtree = tree.getroottree()
+                        rtree.write(fil, xml_declaration=True, encoding='ISO-8859-1')
+
+                    update_datasetsxml(bpd, self.dsid)
+                except OSError as e:
+                    sys.exit(f'failed to execute program {str(e)}')
+
+    def update_dataset(self, datadir, newFile, bpd, dsxml):
         fname = os.path.basename(newFile)
+        self.__toggle_dataset(bpd, dsxml, 'false')
         try:
             ncfile = os.path.join(datadir, fname)
             ds_old = xr.open_dataset(ncfile, decode_cf=False)
@@ -166,7 +188,7 @@ class ERDDAPDATASET(object):
 
             dsall.to_netcdf(ncfile, unlimited_dims='time')
 
-            update_datasetsxml(bpd, self.dsid)
+            self.__toggle_dataset(bpd, dsxml, 'true')
             shutil.rmtree(os.path.dirname(newFile))
             return 'NetCDF Successfully Updated.'
         except Exception as e:
