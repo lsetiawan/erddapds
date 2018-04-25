@@ -175,7 +175,6 @@ class ERDDAPDATASET(object):
 
     def update_dataset(self, datadir, newFile, bpd, dsxml):
         fname = os.path.basename(newFile)
-        self.__toggle_dataset(bpd, dsxml, 'false')
         try:
             ncfile = os.path.join(datadir, fname)
             ds_old = xr.open_dataset(ncfile, decode_cf=False)
@@ -186,9 +185,13 @@ class ERDDAPDATASET(object):
                 dsall[k].encoding = v.encoding
                 dsall[k].attrs = v.attrs
 
-            dsall.to_netcdf(ncfile, unlimited_dims='time')
+            mergetmp = os.path.join(os.path.dirname(newFile), 'merge_tmp')
+            if not os.path.exists(mergetmp):
+                os.mkdir(mergetmp)
+            dsall.to_netcdf(os.path.join(mergetmp, fname), unlimited_dims='time')
+            shutil.move(os.path.join(mergetmp, fname), ncfile)
 
-            self.__toggle_dataset(bpd, dsxml, 'true')
+            update_datasetsxml(bpd, self.dsid)
             shutil.rmtree(os.path.dirname(newFile))
             return 'NetCDF Successfully Updated.'
         except Exception as e:
