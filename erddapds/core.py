@@ -184,6 +184,7 @@ class ERDDAPDATASET(object):
             for k, v in ds_new.items():
                 dsall[k].encoding = v.encoding
                 dsall[k].attrs = v.attrs
+            dsall.attrs = ds_new.attrs
 
             mergetmp = os.path.join(os.path.dirname(newFile), 'merge_tmp')
             if not os.path.exists(mergetmp):
